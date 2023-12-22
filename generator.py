@@ -114,7 +114,7 @@ def get_best_nature(base_stats):
     # Get the best nature for the given spread
     return get_nature(best_nature_stat, worst_offensive_stat)
 
-def get_best_moves(moves, species, nature):
+def get_best_moves(moves, species):
 
     # Move ratings array
     move_ratings = []
@@ -279,8 +279,12 @@ def get_best_evs(moves, base_stats, nature):
     # Eligible stats for investing in
     eligible_stats = ['hp', 'atk', 'def', 'spa', 'spd', 'spe']
 
-    # Remove whichever stat is reduced by the nature
-    eligible_stats.remove(DATA.NATURES[nature]['dec'])
+    # Get whichever stat is reduced by the nature
+    reduced_stat = DATA.NATURES[nature]['dec']
+
+    # Reduced stat is set
+    if reduced_stat: # Remove it
+        eligible_stats.remove(reduced_stat)
 
     # Number of phys/spec moves
     moves_physical = 0
@@ -317,7 +321,7 @@ def get_best_evs(moves, base_stats, nature):
             # Stat is hp
             if stat == 'hp':
                 # Multiply by 1.5x
-                value *= 1.5
+                value *= 1.2
 
             else: # Any other stat
                 # Apply nature modifiers to the stat
@@ -344,7 +348,7 @@ def build_set(species, moves):
     nature = get_best_nature(base_stats)
 
     # Get the best moves for the given species, nature
-    best_moves = get_best_moves(moves, species, nature)[:4]
+    best_moves = get_best_moves(moves, species)[:4]
 
     # Get the best ev spread for the given moves, species, nature
     best_evs = get_best_evs(best_moves, base_stats, nature)
