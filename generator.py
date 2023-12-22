@@ -16,6 +16,7 @@ def get_bst(base_stats):
     return (
         base_stats["hp"]
         + base_stats["atk"]
+        + base_stats["def"]
         + base_stats["spa"]
         + base_stats["spd"]
         + base_stats["spe"]
