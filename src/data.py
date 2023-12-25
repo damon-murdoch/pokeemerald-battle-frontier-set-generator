@@ -1,8 +1,31 @@
-# Rating boosts for status effects
-STATUS_BOOSTS = {"psn": 1.2, "tox": 1.5, "par": 2.0, "slp": 2.0, "brn": 2.0, "frz": 2.0}
+SELF_TARGET = ["self", "allySide", "allyTeam"]
 
-# Rating changes for flags
-FLAG_BOOSTS = {"charge": 0.75}
+SINGLE_TARGET = ["normal", "randomNormal", "adjacentFoe"]
+
+MULTI_TARGET = ["allAdjacentFoes", "allAdjacent"]
+
+OTHER_TARGET = SINGLE_TARGET + MULTI_TARGET
+
+# Protect moves
+# For preventing duplicates
+STATUS_PROTECT = [
+    "burningbulwark",
+    "banefulbunker",
+    "kingsshield",
+    "spikyshield",
+    "silktrap",
+    "obstruct",
+    "protect",
+    "endure",
+]
+
+# Redirect moves
+# For preventing duplicates
+STATUS_REDIRECT = [
+    "ragepowder",
+    "spotlight",
+    "followme",
+]
 
 # Special Cases
 SPECIAL_CASES = {

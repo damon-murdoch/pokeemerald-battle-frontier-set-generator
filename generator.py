@@ -24,7 +24,7 @@ import src.moveutils as mvutils
 
 def build_set(species, moves):
     # Get the best moves for the given species, nature
-    best_moves = mvutils.get_best_moves(moves, species)[:4]
+    best_moves = mvutils.get_best_moves(moves, species)
 
     """
     # Get the base stats for the species
@@ -88,8 +88,13 @@ if __name__ == "__main__":
             species_moves = None
             species_json = None
 
+            # Leftover species to process
+            alternate_formes = []
+
             # Read the content from the file
             lines = file.readlines()
+
+            print(f"Reading {len(lines)} lines ...")
 
             # Read over the file
             for line in lines:
@@ -168,7 +173,72 @@ if __name__ == "__main__":
                         species_set = build_set(species_json, species_moves)
 
                         # Add the set to the species list
-                        pokemon_sets[raw_species] = species_set
+                        pokemon_sets[constant_species] = species_set
+
+                        # Species has other formes
+                        if "otherFormes" in species_json:
+
+                            # Loop over all of the formes
+                            for forme in species_json["otherFormes"]:
+
+                                # Add to the left-over list
+                                alternate_formes.append({
+                                    "name": forme,
+                                    "moves": species_moves, 
+                                    "showdown": utils.get_showdown_format(forme),
+                                    "constant": utils.get_pokeemerald_format(forme),
+                                })
+
+                                # Will be processed after, if no duplicates are found
+
+            print(f"File processed successfully. Handling {len(alternate_formes)} alternate formes ...")
+
+            # Loop over all of the formes
+            for forme in alternate_formes:
+
+                # Get forme pretty name
+                name = forme["name"]
+
+                # Dereference showdown forme name
+                showdown = forme["showdown"]
+
+                # Pokeemerald constant forme name
+                constant = forme["constant"]
+
+                # Assume not seen
+                new = True
+
+                # Loop over the sets
+                for set in pokemon_sets:
+                    # Dereference current set data
+                    set_data = pokemon_sets[set]
+                    
+                    # Set matches current species name
+                    if name == set_data["species"]:
+                        new = False
+                        break
+                
+                # Sets not created yet
+                if new == True:
+
+                    # Showdown has data for this species
+                    if showdown in PS.POKEMON:
+
+                        print(f"Processing alternate forme {name} ...")
+
+                        # Get the json data for the forme
+                        forme_json = PS.POKEMON[forme["showdown"]]
+
+                        # Build the set for the new forme
+                        forme_set = build_set(forme_json, forme["moves"])
+
+                        # Add the set to the species list
+                        pokemon_sets[forme["constant"]] = forme_set
+                    
+                    else: # No showdown data
+                        print(f"No showdown data for forme {name}, skipping ...")
+                else: # Sets already added
+                    print(f"Already added sets for forme {name}, skipping ...")
 
             # Argument number greater than zero
             if arg_num > 0:

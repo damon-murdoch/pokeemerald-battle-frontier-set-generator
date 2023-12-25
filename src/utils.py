@@ -22,6 +22,11 @@ def get_atk_spa_ratio(base_stats, nature="quirky"):
         base_stats["spa"] * DATA.NATURE_MODIFIERS[nature]["spa"]
     )
 
+def get_def_spd_ratio(base_stats, nature="quirky"):
+    # Get atk/spa ratio (atk > 1, spa < 1)
+    return (base_stats["def"] * DATA.NATURE_MODIFIERS[nature]["def"]) / (
+        base_stats["spd"] * DATA.NATURE_MODIFIERS[nature]["spd"]
+    )
 
 def get_offensive_defensive_ratio(base_stats, nature="quirky"):
     # Calculates roughly if the Pokemon is more offensive or defensive orientated, by comparing the average of the
