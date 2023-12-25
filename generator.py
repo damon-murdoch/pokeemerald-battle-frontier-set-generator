@@ -18,31 +18,23 @@ import src.utils as utils
 # Move Utils
 import src.moveutils as mvutils
 
-# Spread Utils
-# import src.spreadutils as sputils
+# Spread utils
+import src.spreadutils as sputils
 
 
 def build_set(species, moves):
     # Get the best moves for the given species, nature
     best_moves = mvutils.get_best_moves(moves, species)
 
-    """
-    # Get the base stats for the species
-    base_stats = species["baseStats"]
-
-    # Get the best nature for the species stats
-    nature = sputils.get_best_nature(base_stats)
-
     # Get the best ev spread for the given moves, species, nature
-    best_evs = sputils.get_best_evs(best_moves, base_stats, nature)
-    """
+    evs, nature = sputils.get_best_spread(best_moves, species)
 
     # Build the set object
     species_set = {
         "species": species["name"],
         "item": None,
-        "nature": None,  # nature,
-        "evs": None,  # best_evs,
+        "nature": nature,
+        "evs": evs,
         "moves": [move["move"] for move in best_moves],
     }
 
@@ -81,8 +73,8 @@ if __name__ == "__main__":
             pokemon_sets = {}
 
             # Name Constants
-            constant_species = None
-            showdown_species = None
+            species_constant = None
+            species_showdown = None
 
             # Data Constants
             species_moves = None
@@ -106,55 +98,55 @@ if __name__ == "__main__":
                     print(f"Processing species '{raw_species}' ...")
 
                     # Convert to header species constant format
-                    constant_species = utils.get_pokeemerald_format(raw_species)
+                    species_constant = utils.get_pokeemerald_format(raw_species)
 
                     # Convert to bulbapedia data extract format
-                    showdown_species = utils.get_showdown_format(raw_species)
+                    species_showdown = utils.get_showdown_format(raw_species)
 
                     # Species is not found in the bulbapedia list
-                    if not showdown_species in PS.POKEMON:
+                    if not species_showdown in PS.POKEMON:
                         # Handle hisuian species
-                        if "hisuian" in showdown_species:
-                            showdown_species = showdown_species.replace(
+                        if "hisuian" in species_showdown:
+                            species_showdown = species_showdown.replace(
                                 "hisuian", "hisui"
                             )
 
                         # Handle alolan species
-                        elif "alolan" in showdown_species:
-                            showdown_species = showdown_species.replace(
+                        elif "alolan" in species_showdown:
+                            species_showdown = species_showdown.replace(
                                 "alolan", "alola"
                             )
 
                         # Handle galarian species
-                        elif "galarian" in showdown_species:
-                            showdown_species = showdown_species.replace(
+                        elif "galarian" in species_showdown:
+                            species_showdown = species_showdown.replace(
                                 "galarian", "galar"
                             )
 
                             # Galarian special cases
-                            if showdown_species in DATA.SPECIAL_CASES:
-                                showdown_species = DATA.SPECIAL_CASES[showdown_species]
+                            if species_showdown in DATA.SPECIAL_CASES:
+                                species_showdown = DATA.SPECIAL_CASES[species_showdown]
 
                         # If the bulbapedia species is in the special cases list
-                        elif showdown_species in DATA.SPECIAL_CASES:
+                        elif species_showdown in DATA.SPECIAL_CASES:
                             # Use the special case instead of the generic conversion
-                            showdown_species = DATA.SPECIAL_CASES[showdown_species]
+                            species_showdown = DATA.SPECIAL_CASES[species_showdown]
 
                     # If the species is found in the list
-                    if showdown_species in PS.POKEMON:
+                    if species_showdown in PS.POKEMON:
                         print(
-                            f"Species data retrieved successfully: '{showdown_species}' ..."
+                            f"Species data retrieved successfully: '{species_showdown}' ..."
                         )
 
                         # Get species json data
-                        species_json = PS.POKEMON[showdown_species]
+                        species_json = PS.POKEMON[species_showdown]
 
                         # Allocate moves list
                         species_moves = []
 
                     else:  # Unable to find species data
                         print(
-                            f"Unable to find data for species '{showdown_species}', skipping ..."
+                            f"Unable to find data for species '{species_showdown}', skipping ..."
                         )
 
                         # Null moves list
@@ -169,11 +161,23 @@ if __name__ == "__main__":
 
                     # Line is ending
                     if "};" in line:
-                        # Generate the set for the species
-                        species_set = build_set(species_json, species_moves)
 
-                        # Add the set to the species list
-                        pokemon_sets[constant_species] = species_set
+                        # Sets per species is not none, and is set to a value of greater than 1
+                        if CONFIG.SETS_PER_SPECIES != None and CONFIG.SETS_PER_SPECIES > 1:
+                            for i in range(1, CONFIG.SETS_PER_SPECIES + 1):
+
+                                # Build the set for the new forme
+                                species_set = build_set(species_json, species_moves)
+
+                                # Add the set to the species list (with number indicator)
+                                pokemon_sets[f"{species_constant}_{i}"] = species_set
+                        else:
+                            # Generate the set for the species
+                            species_set = build_set(species_json, species_moves)
+
+                            # Add the set to the species list
+                            pokemon_sets[species_constant] = species_set
+
 
                         # Species has other formes
                         if "otherFormes" in species_json:
@@ -229,12 +233,23 @@ if __name__ == "__main__":
                         # Get the json data for the forme
                         forme_json = PS.POKEMON[forme["showdown"]]
 
-                        # Build the set for the new forme
-                        forme_set = build_set(forme_json, forme["moves"])
+                        # Sets per species is not none, and is set to a value of greater than 1
+                        if CONFIG.SETS_PER_SPECIES != None and CONFIG.SETS_PER_SPECIES > 1:
+                            for i in range(1, CONFIG.SETS_PER_SPECIES + 1):
 
-                        # Add the set to the species list
-                        pokemon_sets[forme["constant"]] = forme_set
-                    
+                                # Build the set for the new forme
+                                forme_set = build_set(forme_json, forme["moves"])
+
+                                # Add the set to the species list (with number indicator)
+                                pokemon_sets[f"{forme['constant']}_{i}"] = forme_set
+
+                        else: # One set only
+                            # Build the set for the new forme
+                            forme_set = build_set(forme_json, forme["moves"])
+
+                            # Add the set to the species list
+                            pokemon_sets[forme["constant"]] = forme_set
+                        
                     else: # No showdown data
                         print(f"No showdown data for forme {name}, skipping ...")
                 else: # Sets already added

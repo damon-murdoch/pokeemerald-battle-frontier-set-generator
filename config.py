@@ -17,7 +17,31 @@ RANDOM_SEED = "123456789"  # None
 # (second value). If you would like to
 # not have any randomness applied, set
 # the value to 'None'.
-RANDOM_MOVE_MULTIPLIER_RANGE = None  # [0.8,1.2]
+RANDOM_MOVE_MULTIPLIER_RANGE = [0.5,1.5] # None
+
+# If this is set to true, the chosen 
+# nature will be selected randomly 
+# from the remaining set rather 
+# than chosen via the optimal
+# first method
+RANDOM_SELECT_NATURE = True
+
+# If this is set to true, the
+# chosen evs will be selected
+# randomly from the remaining
+# set rather than chosen via
+# the optimal-first method
+RANDOM_SELECT_EVS = False
+
+# If this is set, 'n' number
+# of sets will be generated
+# for each species
+
+# This is only really useful
+# when the random modifier
+# is applied, otherwise all
+# of the sets will be the same
+SETS_PER_SPECIES = 3
 
 #### MOVE RATINGS ####
 
@@ -181,6 +205,7 @@ MOVE_MULTIPLIERS = {
     "MOVE_BABY_DOLL_EYES": 0.25,
     "MOVE_DYNAMIC_PUNCH": 0.25,
     "MOVE_COTTON_SPORE": 0.25,
+    "MOVE_SWEET_SCENT": 0.25,
     "MOVE_FOCUS_PUNCH": 0.25,
     "MOVE_WORRY_SEED": 0.25,
     "MOVE_TORMENT": 0.25,
@@ -356,7 +381,7 @@ VOLATILE_STATUS_MULTIPLIERS = {
     "noretreat": 1.0,
     "roost": 1.0,
     "mustrecharge": 1.0,  # Handled by flags
-    "lockedmove": 0.5,
+    "lockedmove": 0.3,
 }
 
 # Maximum number of same-type moves
